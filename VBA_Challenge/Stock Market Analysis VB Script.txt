@@ -1,0 +1,58 @@
+Sub stock_data()
+    Dim firstRow As Integer
+    Dim openPrice As Double
+    Dim closePrice As Double
+    Dim Volume As Long
+    Dim priceChange As Double
+    Dim pctChange As Double
+    Dim summaryRow As Integer
+    Dim WS_Count As Integer
+    Dim w As Integer
+    
+    WS_Count = ActiveWorkbook.Worksheets.Count
+    For w = 1 To WS_Count
+        
+        summaryRow = 2
+        firstRow = 1
+        lastrow = Sheets(w).Cells(Rows.Count, "A").End(xlUp).Row
+        
+        For i = 2 To lastrow
+            If firstRow = 1 Then
+                openPrice = Sheets(w).Cells(i, 3).Value
+                firstRow = 0
+            End If
+            
+            If Sheets(w).Cells(i + 1, 1).Value = Sheets(w).Cells(i, 1).Value And firstRow <> 1 Then
+                Volume = Sheets(w).Cells(i, 7).Value
+                
+            Else
+                Volume = Sheets(w).Cells(i, 7).Value
+                closePrice = Sheets(w).Cells(i, 6).Value
+                priceChange = closePrice - openPrice
+                If openPrice <> 0 Then
+                    pctChange = priceChange / openPrice
+                Else
+                    pctChange = 0
+                End If
+                
+                Sheets(w).Cells(1, 9).Value = "Ticker"
+                Sheets(w).Cells(1, 10).Value = "Yearly Price Change"
+                Sheets(w).Cells(1, 11).Value = "Percent Change"
+                Sheets(w).Cells(1, 12).Value = "Volume"
+                Sheets(w).Cells(summaryRow, 9).Value = Sheets(w).Cells(i, 1).Value
+                Sheets(w).Cells(summaryRow, 10).Value = priceChange
+                If priceChange > 0 Then
+                    Sheets(w).Cells(summaryRow, 10).Interior.ColorIndex = 4
+                Else
+                    Sheets(w).Cells(summaryRow, 10).Interior.ColorIndex = 3
+                End If
+                Sheets(w).Cells(summaryRow, 11).Value = pctChange
+                Sheets(w).Cells(summaryRow, 11).NumberFormat = "0.00%"
+                Sheets(w).Cells(summaryRow, 12).Value = Volume
+                firstRow = 1
+                Volume = 0
+                summaryRow = summaryRow + 1
+            End If
+        Next i
+    Next w
+End Sub
